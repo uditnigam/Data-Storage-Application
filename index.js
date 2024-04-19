@@ -12,10 +12,17 @@ let edit = {
     activeId: null
 };
 
-//Function calling to get and display all the data from the databasein the UI.
+//Function calling to get and display all the data from the database in the UI.
 setTimeout(function () {
     getCardInfoFromDatabase();
 }, 200);
+
+//Getting data from Database
+function getCardInfoFromDatabase() {
+    cardsInfo.forEach((data) => {
+        displayCard(data.name, data.age, data.address, data.imageName, data.imageSrc, data.id);
+    })
+};
 
 submitButton.addEventListener("click", (e) => {
     let name = nameInput.value;
@@ -30,16 +37,33 @@ submitButton.addEventListener("click", (e) => {
         const fileReader = new FileReader();
         fileReader.readAsDataURL(imageFile.files[0]);
         fileReader.addEventListener("load", function (e) {
-            console.log(edit.isEdit, "edit")
             if (edit.isEdit) {
                 editInformation(name, age, address, imageFile.files[0].name, e.target.result);
-
             } else {
                 createInformationCard(name, age, address, imageFile.files[0].name, e.target.result);
             }
         })
     }
 });
+
+//To edit the information of the card
+function editInformation(updatedName, updatedAge, updatedAddress, imageName, imageSrc) {
+    const infoCard = document.querySelectorAll(".cards");
+    infoCard.forEach((card) => {
+        if (edit.activeId == card.getAttribute("id")) {
+            card.children[2].children[0].innerText = " Name : " + updatedName;
+            card.children[2].children[1].innerText = " Age : " + updatedAge;
+            card.children[2].children[2].innerText = " Address : " + updatedAddress;
+            if (imageName && imageSrc) {
+                card.children[1].children[0].name = imageName;
+                card.children[1].children[0].src = imageSrc;
+            }
+        }
+    })
+    updateData(edit.activeId, updatedName, updatedAge, updatedAddress, imageName, imageSrc);
+    clearInputValues();
+};
+
 
 //Function to create a card
 function createInformationCard(name, age, address, imageName, imageSrc) {
@@ -84,20 +108,13 @@ function displayCard(name, age, address, imageName, imageSrc, id) {
             deleteCardFromCardContainer(e);
             infoCard.remove();
         }
-        if (e.target.parentElement.classList.contains("edit-button")) {
+        if (e.target.classList.contains("edit-button")) {
             edit.isEdit = true;
             edit.activeId = id;
             displayInformationOnInput(id, name, age, address, imageName, imageSrc);
         }
     })
     return infoCard;
-};
-
-//Getting data from Database
-function getCardInfoFromDatabase() {
-    cardsInfo.forEach((data) => {
-        displayCard(data.name, data.age, data.address, data.imageName, data.imageSrc, data.id);
-    })
 };
 
 //To generate random unique id
@@ -116,24 +133,6 @@ function displayInformationOnInput(id, name, age, address, imageName, imageSrc) 
     nameInput.value = name;
     ageInput.value = age;
     addressInput.value = address;
-};
-
-//To edit the information of the card
-function editInformation(updatedName, updatedAge, updatedAddress, imageName, imageSrc) {
-    const infoCard = document.querySelectorAll(".cards");
-    infoCard.forEach((card) => {
-        if (edit.activeId == card.getAttribute("id")) {
-            card.children[2].children[0].innerText = " Name : " + updatedName;
-            card.children[2].children[1].innerText = " Age : " + updatedAge;
-            card.children[2].children[2].innerText = " Address : " + updatedAddress;
-            if (imageName && imageSrc) {
-                card.children[1].children[0].name = imageName;
-                card.children[1].children[0].src = imageSrc;
-            }
-        }
-    })
-    updateData(edit.activeId, updatedName, updatedAge, updatedAddress, imageName, imageSrc);
-    clearInputValues();
 };
 
 //to clear the input values of the form after submission

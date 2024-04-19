@@ -11,7 +11,6 @@ request.onerror = function (event) {
 }
 request.onupgradeneeded = function (event) {
     db = request.result;
-
     db.createObjectStore("forms", { keyPath: "id" });
 }
 
